@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB:financeiro_pessoal}
+    username: ${POSTGRES_USER:financeiro}
+    password: ${POSTGRES_PASSWORD:financeiro}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  flyway:
+    enabled: false
