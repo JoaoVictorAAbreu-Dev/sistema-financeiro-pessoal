@@ -3,7 +3,9 @@ package com.taskflowdev.financeiro.dashboard;
 import com.taskflowdev.financeiro.dashboard.dto.DashboardResponse;
 import com.taskflowdev.financeiro.goal.FinancialGoal;
 import com.taskflowdev.financeiro.goal.FinancialGoalService;
+import com.taskflowdev.financeiro.transaction.FinancialTransaction;
 import com.taskflowdev.financeiro.transaction.FinancialTransactionService;
+import com.taskflowdev.financeiro.transaction.TransactionType;
 import com.taskflowdev.financeiro.user.UserAccount;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,11 +21,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 class DashboardControllerTest {
     @Test
-    void summaryReturnsBalanceAndGoalCount() {
+    void summaryReturnsAggregatedFinancialMetrics() {
         FinancialTransactionService transactionService = new FinancialTransactionService(null, null) {
             @Override
-            public BigDecimal netBalance(String email) {
-                return BigDecimal.ZERO;
+            public List<FinancialTransaction> listByEmail(String email) {
+                UserAccount owner = new UserAccount(email, "x");
+                return List.of(
+                        new FinancialTransaction(owner, TransactionType.INCOME, BigDecimal.valueOf(1000), "salary", java.time.Instant.now()),
+                        new FinancialTransaction(owner, TransactionType.EXPENSE, BigDecimal.valueOf(250), "market", java.time.Instant.now())
+                );
             }
         };
         FinancialGoalService goalService = new FinancialGoalService(null, null) {
@@ -32,7 +38,7 @@ class DashboardControllerTest {
                 return List.of(new FinancialGoal(new UserAccount(email, "x"), "trip", BigDecimal.valueOf(1000)));
             }
         };
-        DashboardController controller = new DashboardController(transactionService, goalService);
+        DashboardController controller = new DashboardController(new DashboardService(transactionService, goalService));
         Authentication authentication = new Authentication() {
             @Override public String getName() { return "user@example.com"; }
             @Override public Object getCredentials() { return null; }
@@ -43,7 +49,10 @@ class DashboardControllerTest {
             @Override public java.util.Collection<? extends GrantedAuthority> getAuthorities() { return List.of(); }
         };
         DashboardResponse response = controller.summary(authentication);
-        assertEquals(0, BigDecimal.ZERO.compareTo(response.balance()));
+        assertEquals(0, BigDecimal.valueOf(750).compareTo(response.balance()));
+        assertEquals(0, BigDecimal.valueOf(1000).compareTo(response.totalIncome()));
+        assertEquals(0, BigDecimal.valueOf(250).compareTo(response.totalExpenses()));
         assertEquals(1, response.goalsCount());
+        assertEquals(1, response.activeGoalsCount());
     }
 }
