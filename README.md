@@ -1,6 +1,19 @@
 # Sistema Financeiro Pessoal
 
-Sistema financeiro pessoal backend-only construído para portfólio, com foco em receitas, despesas, metas, dashboard, relatórios PDF e documentação de API.
+API backend para controle financeiro pessoal, desenvolvida como projeto de portfólio para demonstrar arquitetura limpa, segurança com JWT, persistência em PostgreSQL, geração de relatórios em PDF e documentação de API com Swagger/OpenAPI.
+
+## Visão Geral
+
+O sistema permite ao usuário registrar receitas e despesas, acompanhar metas financeiras, consultar um dashboard consolidado e gerar relatórios em PDF com seus lançamentos.
+
+O foco do projeto está em:
+
+- organização em camadas;
+- regras de negócio centralizadas em services;
+- endpoints enxutos;
+- validação de entrada;
+- testes unitários e de integração;
+- documentação clara para uso e manutenção.
 
 ## Stack
 
@@ -18,35 +31,50 @@ Sistema financeiro pessoal backend-only construído para portfólio, com foco em
 
 ## Funcionalidades
 
-- Cadastro e login com JWT
+- Cadastro e autenticação com JWT
 - Registro de receitas e despesas
 - Metas financeiras por usuário
-- Dashboard com saldo e contagem de metas
-- Relatório PDF com os lançamentos do usuário
-- API documentada com Swagger
+- Dashboard com saldo e visão consolidada
+- Relatório PDF com os lançamentos autenticados
+- API pública documentada com Swagger
 
-## Estrutura
+## Arquitetura
 
-- `backend/` API Spring Boot
-- `docker-compose.yml` banco PostgreSQL local
-- `.env.example` variáveis de ambiente
-- `mvnw` e `mvnw.cmd` para build independente do Maven instalado no PATH
+O backend foi organizado em módulos com separação explícita de responsabilidades:
 
-## Como rodar
+- `auth/` autenticação e emissão de token
+- `transaction/` lançamentos financeiros
+- `goal/` metas financeiras
+- `dashboard/` agregações para painel
+- `report/` geração de PDF
+- `user/` persistência do usuário
+- `config/` segurança, JWT e OpenAPI
+- `exception/` tratamento centralizado de erros
+
+As regras de negócio ficam concentradas nos serviços. Os controllers apenas recebem a requisição, validam o contrato de entrada e delegam a execução para a camada apropriada.
+
+## Estrutura do Projeto
+
+- `backend/` aplicação Spring Boot
+- `docker-compose.yml` infraestrutura local com PostgreSQL
+- `.env.example` variáveis de ambiente esperadas
+- `mvnw` e `mvnw.cmd` wrapper do Maven
+
+## Como Executar Localmente
 
 1. Copie `.env.example` para `.env`.
-2. Suba o PostgreSQL:
+2. Suba o banco de dados:
    ```powershell
    docker compose up -d
    ```
-3. Execute a API:
+3. Inicie a aplicação:
    ```powershell
    .\mvnw.cmd -f backend\pom.xml spring-boot:run
    ```
-4. Acesse a documentação:
+4. Acesse a documentação da API:
    - `http://localhost:8080/swagger-ui/index.html`
 
-## Endpoints principais
+## Endpoints Principais
 
 - `POST /api/auth/register`
 - `POST /api/auth/login`
@@ -60,21 +88,30 @@ Sistema financeiro pessoal backend-only construído para portfólio, com foco em
 
 ## Testes
 
-Executar:
+Executar a suíte:
 
 ```powershell
 .\mvnw.cmd -f backend\pom.xml test
 ```
 
-Cobertura atual:
+Cobertura disponível:
+
 - smoke test de contexto
-- testes unitários de auth
+- testes unitários de autenticação
 - testes unitários de transações
 - testes unitários de metas
-- teste de dashboard
+- teste do dashboard
 
-## Observações
+## Decisões de Projeto
 
-- Este projeto é backend-only por design.
-- O objetivo é demonstrar arquitetura, validação, segurança, persistência e documentação de API.
-- O relatório PDF é gerado localmente a partir dos lançamentos do usuário autenticado.
+- O sistema foi mantido backend-only para reforçar a proposta técnica do portfólio.
+- PostgreSQL é a fonte de verdade.
+- JWT é utilizado para proteger os recursos do usuário autenticado.
+- O relatório PDF é gerado localmente a partir dos dados persistidos.
+
+## Melhorias Futuras
+
+- incluir frontend dedicado;
+- adicionar paginação em listagens;
+- ampliar observabilidade com logs estruturados;
+- criar migrações versionadas caso o schema evolua com frequência.
