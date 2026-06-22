@@ -1,11 +1,11 @@
 package com.taskflowdev.financeiro.goal;
 
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
+import com.taskflowdev.financeiro.goal.dto.FinancialGoalRequest;
+import com.taskflowdev.financeiro.goal.dto.FinancialGoalResponse;
+import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -14,9 +14,9 @@ public class FinancialGoalController {
     private final FinancialGoalService service;
     public FinancialGoalController(FinancialGoalService service) { this.service = service; }
     @PostMapping
-    public FinancialGoal create(Authentication auth, @RequestParam @NotBlank String name, @RequestParam @DecimalMin("0.01") BigDecimal targetAmount) {
-        return service.create(auth.getName(), name, targetAmount);
+    public FinancialGoalResponse create(Authentication auth, @Valid @RequestBody FinancialGoalRequest request) {
+        return FinancialGoalMapper.toResponse(service.create(auth.getName(), request.name(), request.targetAmount()));
     }
     @GetMapping
-    public List<FinancialGoal> list(Authentication auth) { return service.list(auth.getName()); }
+    public List<FinancialGoalResponse> list(Authentication auth) { return service.list(auth.getName()).stream().map(FinancialGoalMapper::toResponse).toList(); }
 }

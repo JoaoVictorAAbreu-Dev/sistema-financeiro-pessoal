@@ -1,11 +1,11 @@
 package com.taskflowdev.financeiro.transaction;
 
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
+import com.taskflowdev.financeiro.transaction.dto.FinancialTransactionRequest;
+import com.taskflowdev.financeiro.transaction.dto.FinancialTransactionResponse;
+import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -15,17 +15,17 @@ public class FinancialTransactionController {
     public FinancialTransactionController(FinancialTransactionService service) { this.service = service; }
 
     @PostMapping("/income")
-    public FinancialTransaction createIncome(Authentication auth, @RequestParam @DecimalMin("0.01") BigDecimal amount, @RequestParam @NotBlank String description) {
-        return service.record(auth.getName(), TransactionType.INCOME, amount, description);
+    public FinancialTransactionResponse createIncome(Authentication auth, @Valid @RequestBody FinancialTransactionRequest request) {
+        return FinancialTransactionMapper.toResponse(service.record(auth.getName(), TransactionType.INCOME, request.amount(), request.description()));
     }
 
     @PostMapping("/expense")
-    public FinancialTransaction createExpense(Authentication auth, @RequestParam @DecimalMin("0.01") BigDecimal amount, @RequestParam @NotBlank String description) {
-        return service.record(auth.getName(), TransactionType.EXPENSE, amount, description);
+    public FinancialTransactionResponse createExpense(Authentication auth, @Valid @RequestBody FinancialTransactionRequest request) {
+        return FinancialTransactionMapper.toResponse(service.record(auth.getName(), TransactionType.EXPENSE, request.amount(), request.description()));
     }
 
     @GetMapping
-    public List<FinancialTransaction> list(Authentication auth) {
-        return service.listByEmail(auth.getName());
+    public List<FinancialTransactionResponse> list(Authentication auth) {
+        return service.listByEmail(auth.getName()).stream().map(FinancialTransactionMapper::toResponse).toList();
     }
 }
