@@ -1,5 +1,10 @@
 # Sistema Financeiro Pessoal
 
+![Java](https://img.shields.io/badge/Java-21-red)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.x-brightgreen)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED)
+
 API backend para controle financeiro pessoal, desenvolvida como projeto de portfólio para demonstrar arquitetura limpa, segurança com JWT, persistência em PostgreSQL, geração de relatórios em PDF e documentação de API com Swagger/OpenAPI.
 
 ## Visão Geral
@@ -101,6 +106,10 @@ Cobertura disponível:
 - testes unitários de transações
 - testes unitários de metas
 - teste do dashboard
+
+## Capturas de Execução
+
+![Swagger UI do Sistema Financeiro Pessoal](C:/Users/jv921/Documents/Codex/2026-06-21/que/outputs/projeto1-swagger.png)
 
 ## Decisões de Projeto
 
